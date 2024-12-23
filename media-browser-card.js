@@ -128,7 +128,33 @@ function updateClientData(changes) {
   localStorage.setItem("homeassistant.mediabrowsercard", clientDataJson);
 }
 
+class MediaBrowserConfigCard extends LitElement {
+  setConfig(config) {
+    this._config = config;
+  }
+
+  configChanged(newConfig) {
+    const event = new Event('config-changed', {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = { config: newConfig };
+    this.dispatchEvent(event);
+  }
+}
+
 class MediaBrowserCard extends LitElement {
+  static getConfigElement() {
+    return document.createElement('media-browser-card-editor');
+  }
+
+  static getStubConfig() {
+    return {
+      target: "Browser",
+      start_dir: "/",
+    };
+  }
+
   static get properties() {
     return {
       hass: {},
@@ -527,3 +553,11 @@ class MediaBrowserCard extends LitElement {
 }
 
 customElements.define("media-browser-card", MediaBrowserCard);
+customElements.define("media-browser-card-editor", MediaBrowserConfigCard);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'media-browser-card',
+  name: "Media Browser Card",
+  description: "A card to browse your Home Assistant Media Library",
+});
